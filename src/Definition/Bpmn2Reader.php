@@ -71,7 +71,7 @@ class Bpmn2Reader
     private function readDocument(\DOMDocument $document, $workflowId = null)
     {
         $errorToExceptionContext = new ErrorToExceptionContext(E_WARNING, function () use ($document) {
-            $document->schemaValidate(dirname(__DIR__) . '/schema/BPMN20.xsd');
+            $document->schemaValidate(dirname(__DIR__) . '/Resources/config/workflower/schema/BPMN20.xsd');
         });
         $errorToExceptionContext->invoke();
 
