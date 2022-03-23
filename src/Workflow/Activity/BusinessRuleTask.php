@@ -5,13 +5,13 @@ namespace Yummuu\Workflower\Workflow\Activity;
 /**
  * @since Class available since Release 2.0.0
  */
-class UserTask extends OperationalTask
+class BusinessRuleTask extends OperationalTask
 {
-    private $formData = [];
+    private $camundaDecisionRef;         //details decisionRef 
 
-    public function getFormData()
+    public function getDecisionRef()
     {
-        return $this->formData;
+        return $this->camundaDecisionRef;
     }
 
     public function __construct(array $config = [])
@@ -32,19 +32,7 @@ class UserTask extends OperationalTask
     {
         return serialize([
             get_parent_class($this) => parent::serialize(),
-            'formData'              => $this->formData
+            'camundaDecisionRef'    => $this->camundaDecisionRef
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function equals($target)
-    {
-        if (!($target instanceof self)) {
-            return false;
-        }
-
-        return $this->id === $target->getId();
     }
 }

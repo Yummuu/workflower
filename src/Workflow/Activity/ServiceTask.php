@@ -1,20 +1,43 @@
 <?php
-/*
- * Copyright (c) Atsuhiro Kubo <kubo@iteman.jp> and contributors,
- * All rights reserved.
- *
- * This file is part of Workflower.
- *
- * This program and the accompanying materials are made available under
- * the terms of the BSD 2-Clause License which accompanies this
- * distribution, and is available at http://opensource.org/licenses/BSD-2-Clause
- */
 
 namespace Yummuu\Workflower\Workflow\Activity;
 
-/**
- * @since Class available since Release 1.2.0
- */
 class ServiceTask extends OperationalTask
 {
+    private $camundaExpression;    //details expression  camunda:expression
+
+    private $camundaTopic;         //details type camunda:topic
+
+    public function getTaskExpression()
+    {
+        return $this->camundaExpression;
+    }
+
+    public function getTaskTopic()
+    {
+        return $this->camundaTopic;
+    }
+
+    public function __construct(array $config = [])
+    {
+        parent::__construct($config);
+        
+        foreach ($config as $name => $value) {
+            if (property_exists(self::class, $name)) {
+                $this->{$name} = $value;
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([
+            get_parent_class($this) => parent::serialize(),
+            'camundaExpression'     => $this->camundaExpression,
+            'camundaTopic'          => $this->camundaTopic,
+        ]);
+    }
 }

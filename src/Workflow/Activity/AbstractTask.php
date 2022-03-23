@@ -66,7 +66,6 @@ abstract class AbstractTask extends FlowObject implements ActivityInterface, \Se
      */
     private $outputParameters = [];
 
-    private $formData = []; 
 
     /**
      * @var string
@@ -106,8 +105,7 @@ abstract class AbstractTask extends FlowObject implements ActivityInterface, \Se
             'completionCondition' => $this->completionCondition,
             'workItems' => $this->workItems,
             'inputParameters' => $this->inputParameters,
-            'outputParameters' => $this->outputParameters,
-            'formData'         => $this->formData
+            'outputParameters' => $this->outputParameters
         ]);
     }
 
@@ -289,10 +287,6 @@ abstract class AbstractTask extends FlowObject implements ActivityInterface, \Se
         return $this->outputParameters;
     }
 
-    public function getFormData()
-    {
-        return $this->formData;
-    }
 
     /**
      * {@inheritdoc}

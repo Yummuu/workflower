@@ -6,6 +6,7 @@ use Yummuu\Workflower\Workflow\Activity\CallTask;
 use Yummuu\Workflower\Workflow\Activity\ManualTask;
 use Yummuu\Workflower\Workflow\Activity\SendTask;
 use Yummuu\Workflower\Workflow\Activity\ServiceTask;
+use Yummuu\Workflower\Workflow\Activity\BusinessRuleTask;
 use Yummuu\Workflower\Workflow\Activity\SubProcessTask;
 use Yummuu\Workflower\Workflow\Activity\Task;
 use Yummuu\Workflower\Workflow\Activity\UserTask;
@@ -106,6 +107,8 @@ class ProcessDefinition implements ProcessDefinitionInterface
      * @since Property available since Release 1.2.0
      */
     private $serviceTasks = [];
+
+    private $businessRuleTasks = [];
 
     /**
      * @var array
@@ -219,6 +222,12 @@ class ProcessDefinition implements ProcessDefinitionInterface
                     }
                     break;
 
+                case 'businessRuleTasks':
+                    foreach ($definitions as $definition) {
+                        $this->addBusinessRuleTask($definition);
+                    }
+                    break;
+
                 case 'sendTasks':
                     foreach ($definitions as $definition) {
                         $this->addSendTask($definition);
@@ -282,6 +291,36 @@ class ProcessDefinition implements ProcessDefinitionInterface
     public function getVersion()
     {
         return $this->version;
+    }
+
+    /**
+     * 自定义-获取serviceTasks
+     *
+     * @return void
+     */
+    public function getServiceTasks()
+    {
+        return $this->serviceTasks;
+    }
+
+    /**
+     * 自定义-获取sequenceFlows
+     *
+     * @return array
+     */
+    public function getSequenceFlows()
+    {
+        return $this->sequenceFlows;
+    }
+
+    /**
+     * 自定义-获取exclusiveGateways
+     *
+     * @return array
+     */
+    public function getExclusiveGateways()
+    {
+        return $this->exclusiveGateways;
     }
 
     /**
@@ -368,6 +407,13 @@ class ProcessDefinition implements ProcessDefinitionInterface
             $this->replaceRoleInConfig($processInstance, $clone);
 
             $processInstance->addFlowObject(new ServiceTask($clone));
+        }
+
+        foreach ($this->businessRuleTasks as $config) {
+            $clone = array_merge([], $config);
+            $this->replaceRoleInConfig($processInstance, $clone);
+
+            $processInstance->addFlowObject(new BusinessRuleTask($clone));
         }
 
         foreach ($this->sendTasks as $config) {
@@ -534,8 +580,8 @@ class ProcessDefinition implements ProcessDefinitionInterface
         $id = $this->getParamFromConfig($config, 'id');
 
         if ($id === null) {
-            $id = $this->getParamFromConfig($config, 'source', 'source').
-                '.'.$this->getParamFromConfig($config, 'destination', 'destination').$i;
+            $id = $this->getParamFromConfig($config, 'source', 'source') .
+                '.' . $this->getParamFromConfig($config, 'destination', 'destination') . $i;
             ++$i;
         }
 
@@ -597,6 +643,7 @@ class ProcessDefinition implements ProcessDefinitionInterface
      *                      'multiInstance' => (bool)
      *                      'sequential' => (bool)
      *                      'completionCondition' => (string)
+     *                      'formData' => (array)
      *                      ]
      */
     public function addUserTask(array $config)
@@ -645,7 +692,9 @@ class ProcessDefinition implements ProcessDefinitionInterface
      *                      'defaultSequenceFlow' => (int|string)
      *                      'multiInstance' => (bool)
      *                      'sequential' => (bool)
-     *                      'completionCondition' => (string)
+     *                      'completionCondition' => (string),
+     *                      'camundaExpression' => (string),
+     *                      'camundatopicTopic' => (string)
      *                      ]
      */
     public function addServiceTask(array $config)
@@ -654,6 +703,32 @@ class ProcessDefinition implements ProcessDefinitionInterface
         $defaultSequenceFlow = $this->getParamFromConfig($config, 'defaultSequenceFlowId');
 
         $this->serviceTasks[$id] = $config;
+
+        if ($defaultSequenceFlow !== null) {
+            $this->defaultableFlowObjects[$defaultSequenceFlow] = $id;
+        }
+    }
+
+        /**
+     * @param array $config Array containing the necessary params.
+     *                      $config = [
+     *                      'id' => (string)
+     *                      'roleId' => (string)
+     *                      'name' => (string)
+     *                      'operation' => (string)
+     *                      'defaultSequenceFlow' => (int|string)
+     *                      'multiInstance' => (bool)
+     *                      'sequential' => (bool)
+     *                      'completionCondition' => (string)
+     *                      'camundaDecisionRef'  => (string)
+     *                      ]
+     */
+    public function addBusinessRuleTask(array $config)
+    {
+        $id = $this->getParamFromConfig($config, 'id');
+        $defaultSequenceFlow = $this->getParamFromConfig($config, 'defaultSequenceFlowId');
+
+        $this->businessRuleTasks[$id] = $config;
 
         if ($defaultSequenceFlow !== null) {
             $this->defaultableFlowObjects[$defaultSequenceFlow] = $id;

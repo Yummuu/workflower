@@ -14,6 +14,7 @@ namespace Yummuu\Workflower\Definition;
 
 use Yummuu\Workflower\Workflow\WorkflowRepository;
 use PHPUnit\Framework\TestCase;
+use Yummuu\Workflower\Workflow\OperationRunnerDespatcher;
 
 class Bpmn2ReaderTest extends TestCase
 {
@@ -49,5 +50,26 @@ class Bpmn2ReaderTest extends TestCase
         $definitions[0]->setProcessDefinitions($dest->getProcessDefinition()->getProcessDefinitions());
 
         $this->assertThat($instance, $this->equalTo($dest));
+    }
+
+    public function testReadSourceAndGetServiceTasks()
+    {
+        $import      = new Bpmn2Reader();
+        $definitions = $import->readSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/CamundaTest1.bpmn'));
+        $item        = current($definitions);
+        var_dump($item);
+        $this->assertIsObject($item);
+    }
+
+    public function testProcessStart()
+    {
+        $repository = new ProcessDefinitionRepository();
+        $repository->importFromSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/CamundaTest1.bpmn'));
+        $process = $repository->getLatestById('Process_0zi0j0a')->createProcessInstance();
+        $process->setOperationRunner(new OperationRunnerDespatcher());
+        $process->setProcessData([]);
+        $process->start($process->getFirstStartEvent());
+        $reponse = $process->getProcessData();
+        $this->assertTrue($reponse);
     }
 }

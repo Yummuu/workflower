@@ -154,6 +154,7 @@ class Bpmn2Reader
         $process['manualTasks'] = $this->readTasks($globalData, $process, $rootElement->getElementsByTagNameNs('http://www.omg.org/spec/BPMN/20100524/MODEL', 'manualTask'));
         $process['serviceTasks'] = $this->readTasks($globalData, $process, $rootElement->getElementsByTagNameNs('http://www.omg.org/spec/BPMN/20100524/MODEL', 'serviceTask'));
         $process['sendTasks'] = $this->readTasks($globalData, $process, $rootElement->getElementsByTagNameNs('http://www.omg.org/spec/BPMN/20100524/MODEL', 'sendTask'));
+        $process['businessRuleTasks'] = $this->readTasks($globalData, $process, $rootElement->getElementsByTagNameNs('http://www.omg.org/spec/BPMN/20100524/MODEL', 'businessRuleTask'));
         $process['callActivities'] = $this->readTasks($globalData, $process, $rootElement->getElementsByTagNameNs('http://www.omg.org/spec/BPMN/20100524/MODEL', 'callActivity'));
 
         foreach ($rootElement->getElementsByTagNameNs('http://www.omg.org/spec/BPMN/20100524/MODEL', 'subProcess') as $element) {
@@ -283,6 +284,18 @@ class Bpmn2Reader
 
         if ($formData) {
             $config['formData'] = $formData;
+        }
+
+        if($element->hasAttribute('camunda:topic')) {
+            $config['camundaTopic'] = $element->getAttribute('camunda:topic');
+        }
+
+        if($element->hasAttribute('camunda:expression')) {
+            $config['camundaExpression'] = $element->getAttribute('camunda:expression');
+        }
+
+        if($element->hasAttribute('camunda:decisionRef')) {
+            $config['camundaDecisionRef'] = $element->getAttribute('camunda:decisionRef');
         }
 
         return $config;
@@ -527,56 +540,58 @@ class Bpmn2Reader
 
     public function dealXmlByXPath(\DOMDocument $document, $data = [])
     {
-        $xpath = new DOMXPath($document);
-        foreach ($data as $name => $config) {
-            $str = "//bpmn:serviceTask[@name='$name']";
-            $serviceTasks = $xpath->query($str);
-            if (is_null($serviceTasks) || $serviceTasks->length == 0) {
-                continue; //没有这个task,就不处理
-            }
-            foreach ($serviceTasks as $taskNode) {
-                if (!$taskNode->hasAttribute('id')) {
-                    continue; //没有id的task是错误的
+        if (!empty($data)) {
+            $xpath = new DOMXPath($document);
+            foreach ($data as $name => $config) {
+                $str = "//bpmn:serviceTask[@name='$name']";
+                $serviceTasks = $xpath->query($str);
+                if (is_null($serviceTasks) || $serviceTasks->length == 0) {
+                    continue; //没有这个task,就不处理
                 }
-                $taskNodeStr = "//bpmn:serviceTask[@id='" . $taskNode->getAttribute('id') . "']";
-                foreach ($config as $item) {
-                    if ($item['type'] != 'inputParameter') {
-                        continue; //目前还不支持其它参数
+                foreach ($serviceTasks as $taskNode) {
+                    if (!$taskNode->hasAttribute('id')) {
+                        continue; //没有id的task是错误的
                     }
-                    $inputNode = $xpath->query($taskNodeStr . "/bpmn:extensionElements/camunda:inputOutput/camunda:inputParameter[@name='" . $item['name'] . "']");
-                    if (!is_null($inputNode) && $inputNode->length > 0) {
-                        $inputNode = $inputNode[0];
-                        //说明有node
-                        $parentNode = $inputNode->parentNode;
-                        $parentNode->removeChild($inputNode);   //返回old child
-                    } else {
-                        //说明没有节点
-                        //要判断是否有extensionElements和inputOutput节点
-                        $parentElements = $xpath->query($taskNodeStr . "/bpmn:extensionElements/camunda:inputOutput");
-                        if (is_null($parentElements) || $parentElements->length == 0) {
-                            //没有inputOutput，那就找extensionElements
-                            $extensionElements = $xpath->query($taskNodeStr . "/bpmn:extensionElements");
-                            if (is_null($extensionElements) || $extensionElements->length == 0) {
-                                //extensionElements也没有
-                                $extensionNew = $document->createElementNS("http://www.omg.org/spec/BPMN/20100524/MODEL", 'extensionElements');
-                                $parentNode = $document->createElementNs("http://camunda.org/schema/1.0/bpmn", 'inputOutput');
-                                $extensionNew->appendChild($parentNode);
-
-                                $taskNode->appendChild($extensionNew);
-                            } else {
-                                $extensionElements = $extensionElements[0];
-                                $parentNode = $document->createElementNs("http://camunda.org/schema/1.0/bpmn", 'inputOutput');
-                                $extensionElements->appendChild($parentNode);
-                            }
-                        } else {
-                            $parentNode = $parentElements[0];
+                    $taskNodeStr = "//bpmn:serviceTask[@id='" . $taskNode->getAttribute('id') . "']";
+                    foreach ($config as $item) {
+                        if ($item['type'] != 'inputParameter') {
+                            continue; //目前还不支持其它参数
                         }
-                        //end- 这里得到的parentNode 是个空的或没有指定child的，所以就不用再removeChild了
-                    }
-                    //开始新增input
-                    $inputNewNode = $this->createInputParameterNode($document, $item['name'], $item['nodeType'], $item['node']);
-                    $parentNode->appendChild($inputNewNode);
-                };
+                        $inputNode = $xpath->query($taskNodeStr . "/bpmn:extensionElements/camunda:inputOutput/camunda:inputParameter[@name='" . $item['name'] . "']");
+                        if (!is_null($inputNode) && $inputNode->length > 0) {
+                            $inputNode = $inputNode[0];
+                            //说明有node
+                            $parentNode = $inputNode->parentNode;
+                            $parentNode->removeChild($inputNode);   //返回old child
+                        } else {
+                            //说明没有节点
+                            //要判断是否有extensionElements和inputOutput节点
+                            $parentElements = $xpath->query($taskNodeStr . "/bpmn:extensionElements/camunda:inputOutput");
+                            if (is_null($parentElements) || $parentElements->length == 0) {
+                                //没有inputOutput，那就找extensionElements
+                                $extensionElements = $xpath->query($taskNodeStr . "/bpmn:extensionElements");
+                                if (is_null($extensionElements) || $extensionElements->length == 0) {
+                                    //extensionElements也没有
+                                    $extensionNew = $document->createElementNS("http://www.omg.org/spec/BPMN/20100524/MODEL", 'extensionElements');
+                                    $parentNode = $document->createElementNs("http://camunda.org/schema/1.0/bpmn", 'inputOutput');
+                                    $extensionNew->appendChild($parentNode);
+
+                                    $taskNode->appendChild($extensionNew);
+                                } else {
+                                    $extensionElements = $extensionElements[0];
+                                    $parentNode = $document->createElementNs("http://camunda.org/schema/1.0/bpmn", 'inputOutput');
+                                    $extensionElements->appendChild($parentNode);
+                                }
+                            } else {
+                                $parentNode = $parentElements[0];
+                            }
+                            //end- 这里得到的parentNode 是个空的或没有指定child的，所以就不用再removeChild了
+                        }
+                        //开始新增input
+                        $inputNewNode = $this->createInputParameterNode($document, $item['name'], $item['nodeType'], $item['node']);
+                        $parentNode->appendChild($inputNewNode);
+                    };
+                }
             }
         }
     }
