@@ -72,4 +72,12 @@ class Bpmn2ReaderTest extends TestCase
         $reponse = $process->getProcessData();
         $this->assertTrue($reponse);
     }
+
+
+    public function testReadDMN()
+    {
+        $import     = new DmnReader();
+        $definition = $import->readSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/DemoDmn.dmn'));
+        $this->assertIsObject($definition);
+    }
 }

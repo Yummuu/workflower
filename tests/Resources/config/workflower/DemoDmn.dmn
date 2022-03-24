@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="Definitions_0vi8udk" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.8.1">
+  <decision id="Decision_1ya1gt7" name="Decision 1">
+    <informationRequirement id="InformationRequirement_0808fts">
+      <requiredDecision href="#Decision_03mve8w" />
+    </informationRequirement>
+    <knowledgeRequirement id="KnowledgeRequirement_1o5gkh3">
+      <requiredKnowledge href="#BusinessKnowledgeModel_0knda2d" />
+    </knowledgeRequirement>
+    <authorityRequirement id="AuthorityRequirement_0st40z4">
+      <requiredAuthority href="#KnowledgeSource_1l7lf08" />
+    </authorityRequirement>
+    <decisionTable id="DecisionTable_03vp3vg" hitPolicy="FIRST">
+      <input id="Input_1" label="score">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1f72o66" label="school" camunda:inputVariable="A,B,C,D">
+        <inputExpression id="LiteralExpression_01j0w39" typeRef="string">
+          <text>{school}</text>
+        </inputExpression>
+        <inputValues id="UnaryTests_1chwmpm">
+          <text>"CN","AU","JP","US","RU"</text>
+        </inputValues>
+      </input>
+      <output id="Output_1" label="error" name="错误" typeRef="boolean" />
+      <output id="OutputClause_0p97c9n" label="level" name="等级" typeRef="string" />
+      <output id="OutputClause_02y3e3n" label="deal" name="学校处理" typeRef="string">
+        <outputValues id="UnaryTests_0vcjnh5">
+          <text>"无","退学","深造"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_0966m01">
+        <description>测试1</description>
+        <inputEntry id="UnaryTests_0707tkd">
+          <text>&gt;100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1r9hr2c">
+          <text>CN</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_11ry2vo">
+          <text>ture</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1k9mvmq">
+          <text>系统错误</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1tta7ax">
+          <text>无</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1puq9bw">
+        <description>2</description>
+        <inputEntry id="UnaryTests_0kngtlp">
+          <text>&gt;90</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01k27ws">
+          <text>AU</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_053siue">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1wjcmpf">
+          <text>优秀</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_16ri3iq">
+          <text>深造</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1fw30cq">
+        <inputEntry id="UnaryTests_14a4ca1">
+          <text>&gt;80</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10mi4t5">
+          <text>JP</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0onfola">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0bcsru5">
+          <text>普通</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1anw5rw">
+          <text>深造</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0tv95kt">
+        <inputEntry id="UnaryTests_1qo3vci">
+          <text>&gt;60</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1d8p2ok">
+          <text>US</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1wpybv7">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_19g4lp9">
+          <text>及格</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1qjz08n">
+          <text>深造</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0tdl8l5">
+        <inputEntry id="UnaryTests_0sp6bpt">
+          <text>&gt;0</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1qgc5ns">
+          <text>RU</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_07euw02">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_01ixdv8">
+          <text>不及格</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0fb32ph">
+          <text>退学</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1up5gae">
+        <inputEntry id="UnaryTests_0xsro4w">
+          <text>&lt;0</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1adf4hu">
+          <text>RU</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1p4ep1i">
+          <text>ture</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0upl8in">
+          <text>系统错误</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0rolu2q">
+          <text>无</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1wzkv7r">
+        <inputEntry id="UnaryTests_0ibsv5x">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1fyodbd">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1txuxvp">
+          <text></text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1jy3tmg">
+          <text></text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1lgjde1">
+          <text></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <knowledgeSource id="KnowledgeSource_1l7lf08" name="知识依赖数据">
+    <authorityRequirement id="AuthorityRequirement_1uj6033">
+      <requiredInput href="#InputData_1g2xafx" />
+    </authorityRequirement>
+  </knowledgeSource>
+  <inputData id="InputData_1g2xafx" name="input数据" />
+  <businessKnowledgeModel id="BusinessKnowledgeModel_0knda2d" name="业务知识模型" />
+  <decision id="Decision_03mve8w">
+    <variable id="InformationItem_0ei7hb3" typeRef="string" />
+    <informationRequirement id="InformationRequirement_1gsvmgk">
+      <requiredDecision href="#Decision_0g76rhv" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_14ty1u2">
+      <requiredInput href="#InputData_0uoj92r" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_1nd1spp" expressionLanguage="javascript">
+      <text>随风倒十分</text>
+    </literalExpression>
+  </decision>
+  <decision id="Decision_0g76rhv" name="none" />
+  <inputData id="InputData_0uoj92r" name="input数据2" />
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="Decision_1ya1gt7">
+        <dc:Bounds height="80" width="180" x="370" y="210" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_0d61n06" dmnElementRef="KnowledgeSource_1l7lf08">
+        <dc:Bounds height="63" width="100" x="170" y="98" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1792hdp" dmnElementRef="AuthorityRequirement_0st40z4">
+        <di:waypoint x="270" y="161" />
+        <di:waypoint x="370" y="222" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_0akppg1" dmnElementRef="InputData_1g2xafx">
+        <dc:Bounds height="45" width="125" x="157" y="318" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_0sl8ado" dmnElementRef="AuthorityRequirement_1uj6033">
+        <di:waypoint x="220" y="318" />
+        <di:waypoint x="220" y="161" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1oeiyen" dmnElementRef="BusinessKnowledgeModel_0knda2d">
+        <dc:Bounds height="46" width="135" x="392" y="447" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1q1etzc" dmnElementRef="KnowledgeRequirement_1o5gkh3">
+        <di:waypoint x="460" y="447" />
+        <di:waypoint x="460" y="290" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_1vdqo8v" dmnElementRef="InformationRequirement_0808fts">
+        <di:waypoint x="700" y="430" />
+        <di:waypoint x="460" y="310" />
+        <di:waypoint x="460" y="290" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1w205ah" dmnElementRef="Decision_03mve8w">
+        <dc:Bounds height="80" width="180" x="610" y="430" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_19v6um2" dmnElementRef="Decision_0g76rhv">
+        <dc:Bounds height="80" width="180" x="630" y="650" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_01p6znm" dmnElementRef="InformationRequirement_1gsvmgk">
+        <di:waypoint x="720" y="650" />
+        <di:waypoint x="700" y="530" />
+        <di:waypoint x="700" y="510" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_0axpid7" dmnElementRef="InputData_0uoj92r">
+        <dc:Bounds height="45" width="125" x="878" y="508" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1w580gg" dmnElementRef="InformationRequirement_14ty1u2">
+        <di:waypoint x="878" y="531" />
+        <di:waypoint x="810" y="470" />
+        <di:waypoint x="790" y="470" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
