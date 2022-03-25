@@ -78,6 +78,6 @@ class Bpmn2ReaderTest extends TestCase
     {
         $import     = new DmnReader();
         $definition = $import->readSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/DemoDmn.dmn'));
-        $this->assertIsObject($definition);
+        $this->assertIsArray($definition->toArray());
     }
 }

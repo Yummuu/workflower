@@ -99,11 +99,11 @@ class DmnReader
             foreach ($element->getElementsByTagName('inputExpression') as $childElement) {
                 $input['inputExpressionId']   = $childElement->getAttribute('id');
                 $input['inputExpressionType'] = $childElement->hasAttribute('typeRef') ? $childElement->getAttribute('typeRef') : '';
-                $input['inputExpression']     = $childElement->textContent;
+                $input['inputExpression']     = trim($childElement->textContent);
             }
             foreach ($element->getElementsByTagName('inputValues') as $childElement) {
                 $input['inputValuesId'] = $childElement->getAttribute('id');
-                $input['inputValues']   = $childElement->textContent;
+                $input['inputValues']   = trim($childElement->textContent);
             }
             $table['input'][] = $input;
         }
@@ -122,7 +122,7 @@ class DmnReader
             ];
             foreach ($element->getElementsByTagName('outputValues') as $childElement) {
                 $output['inputValuesId'] = $childElement->getAttribute('id');
-                $output['inputValues']   = $childElement->textContent;
+                $output['inputValues']   = trim($childElement->textContent);
             }
             $table['output'][] = $output;
         }
@@ -188,6 +188,27 @@ class DmnReader
 
     public function readRequirements(\DOMElement $rootElement): array
     {
-        return [];
+        $requirement = [];
+        foreach ($rootElement->getElementsByTagName('informationRequirement') as $element) {
+            if (!$element->hasAttribute('id')) {
+                throw new IdAttributeNotFoundException(sprintf('Element "%s" has no id', $element->tagName));
+            }
+            $node = $element->firstChild;
+            foreach ($element->getElementsByTagName('requiredDecision') as $node) {
+                $requirement[] = [
+                    'id'       => $element->getAttribute('id'),
+                    'type'     => 'requiredDecision',
+                    'href'     => $node->hasAttribute('href') ? $node->getAttribute('href') : null
+                ];
+            }
+            foreach ($element->getElementsByTagName('requiredInput') as $node) {
+                $requirement[] = [
+                    'id'       => $element->getAttribute('id'),
+                    'type'     => 'requiredInput',
+                    'href'     => $node->hasAttribute('href') ? $node->getAttribute('href') : null
+                ];
+            }
+        }
+        return $requirement;
     }
 }

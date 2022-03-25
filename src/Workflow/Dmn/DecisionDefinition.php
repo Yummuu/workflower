@@ -2,7 +2,7 @@
 
 namespace Yummuu\Workflower\Workflow\Dmn;
 
-class DecisionDefinition
+class DecisionDefinition extends Definition
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class DecisionDefinition
     /**
      * @var DecisionTableDefinition
      */
-    private $decisionTable ;
+    private $decisionTable;
     /**
      * @var array
      */
@@ -36,5 +36,34 @@ class DecisionDefinition
                 $this->{$name} = $value;
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize($this->toArray());
+    }
+
+    public function toJson(): string
+    {
+        return (string) json_encode($this->toArray(), JSON_UNESCAPED_UNICODE);
+    }
+
+    public function toArray(): array
+    {
+        $decisionTable = [];
+        if ($this->decisionTable instanceof DecisionTableDefinition) {
+            $decisionTable = $this->decisionTable->toArray();
+        }
+        return [
+            'id'                => $this->id,
+            'name'              => $this->name,
+            'sequenceFlows'     => $this->sequenceFlows,
+            'decisionTable'     => $decisionTable,
+            'requirements'      => $this->requirements,
+            'literalExpression' => $this->literalExpression
+        ];
     }
 }

@@ -5,7 +5,7 @@ namespace Yummuu\Workflower\Workflow\Dmn;
 /**
  * 决策表
  */
-class DecisionTableDefinition
+class DecisionTableDefinition extends Definition
 {
     /**
      * @var string
@@ -64,24 +64,13 @@ class DecisionTableDefinition
             }
         }
     }
+
     /**
      * {@inheritdoc}
      */
     public function serialize()
     {
         return serialize($this->toArray());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        foreach (unserialize($serialized) as $name => $value) {
-            if (property_exists($this, $name)) {
-                $this->$name = $value;
-            }
-        }
     }
 
     public function toArray(): array
