@@ -63,6 +63,27 @@ class DRDDefinition extends Definition
     }
 
     /**
+     * 从外部直接加载数据时，将数据实例化
+     */
+    public function initDecisionClass()
+    {
+        $decisions = [];
+        foreach ($this->decisions as $item) {
+            if ($item instanceof DecisionDefinition) {
+                $decisions[] = $item;
+                continue;
+            }
+            if (is_array($item)) {
+                $decision = new DecisionDefinition($item);
+                $decision->initDecisionClass();
+            } else {
+                throw new Exception('unkown type of decision');
+            }
+        }
+        $this->decisions = $decisions;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -124,4 +145,5 @@ class DRDDefinition extends Definition
             }
         }
     }
+    
 }
