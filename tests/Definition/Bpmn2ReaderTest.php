@@ -25,7 +25,7 @@ class Bpmn2ReaderTest extends TestCase
     {
         $workflowRepository = new WorkflowRepository();
         $bpmn2Reader = new Bpmn2Reader();
-        $definitions = $bpmn2Reader->read(dirname(__DIR__).'/Resources/config/workflower/LoanRequestProcess.bpmn');
+        $definitions = $bpmn2Reader->read(dirname(__DIR__) . '/Resources/config/workflower/LoanRequestProcess.bpmn');
 
         $instance = $definitions[0]->createProcessInstance();
         $dest = $workflowRepository->findById('LoanRequestProcess');
@@ -43,7 +43,7 @@ class Bpmn2ReaderTest extends TestCase
     {
         $workflowRepository = new WorkflowRepository();
         $bpmn2Reader = new Bpmn2Reader();
-        $definitions = $bpmn2Reader->readSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/LoanRequestProcess.bpmn'));
+        $definitions = $bpmn2Reader->readSource(file_get_contents(dirname(__DIR__) . '/Resources/config/workflower/LoanRequestProcess.bpmn'));
 
         $instance = $definitions[0]->createProcessInstance();
         $dest = $workflowRepository->findById('LoanRequestProcess');
@@ -55,7 +55,7 @@ class Bpmn2ReaderTest extends TestCase
     public function testReadSourceAndGetServiceTasks()
     {
         $import      = new Bpmn2Reader();
-        $definitions = $import->readSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/CamundaTest1.bpmn'));
+        $definitions = $import->readSource(file_get_contents(dirname(__DIR__) . '/Resources/config/workflower/CamundaTest1.bpmn'));
         $item        = current($definitions);
         var_dump($item);
         $this->assertIsObject($item);
@@ -64,7 +64,7 @@ class Bpmn2ReaderTest extends TestCase
     public function testProcessStart()
     {
         $repository = new ProcessDefinitionRepository();
-        $repository->importFromSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/CamundaTest1.bpmn'));
+        $repository->importFromSource(file_get_contents(dirname(__DIR__) . '/Resources/config/workflower/CamundaTest1.bpmn'));
         $process = $repository->getLatestById('Process_0zi0j0a')->createProcessInstance();
         $process->setOperationRunner(new OperationRunnerDespatcher());
         $process->setProcessData([]);
@@ -77,7 +77,16 @@ class Bpmn2ReaderTest extends TestCase
     public function testReadDMN()
     {
         $import     = new DmnReader();
-        $definition = $import->readSource(file_get_contents(dirname(__DIR__).'/Resources/config/workflower/DemoDmn.dmn'));
+        $definition = $import->readSource(file_get_contents(dirname(__DIR__) . '/Resources/config/workflower/DemoDmn.dmn'));
+        file_put_contents(dirname(__DIR__) . '/Runtime/DMN.json', $definition->toJson());
+        $this->assertIsArray($definition->toArray());
+    }
+
+    public function testOutputDMNXML()
+    {
+        $import     = new DmnReader();
+        $definition = $import->readSource(file_get_contents(dirname(__DIR__) . '/Resources/config/workflower/DemoDmn.dmn'));
+        file_put_contents(dirname(__DIR__) . '/Runtime/output.xml', $definition->toXml());
         $this->assertIsArray($definition->toArray());
     }
 }

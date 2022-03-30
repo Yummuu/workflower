@@ -85,4 +85,25 @@ class DecisionDefinition extends Definition
             'literalExpression' => $this->literalExpression
         ];
     }
+
+    public function getXmlNode(\DOMDocument $document): \DOMElement
+    {
+        $node   = $document->createElement("decision");
+        $node->setAttribute("id", $this->id);
+        $node->setAttribute("name", $this->name ? $this->name : "Decision_1");
+
+
+        if ($this->decisionTable instanceof DecisionTableDefinition) {
+            $node->appendChild($this->decisionTable->getXmlNode($document));
+        }
+        if ($this->literalExpression) {
+            $child = $document->createElement("literalExpression");
+            $child->setAttribute("expressionLanguage", "javascript");
+            $textNode = $document->createElement("text");
+            $textNode->textContent = $this->literalExpression;
+            $child->appendChild($textNode);
+            $node->appendChild($child);
+        }
+        return $node;
+    }
 }
